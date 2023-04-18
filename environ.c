@@ -1,0 +1,91 @@
+#include "shell.h"
+
+/**
+ * _myenv - prints the current environment
+ * @info: Structure containing potential arguments. Used to maintain
+ *          constant function prototype.
+ * Return: Always 0
+ */
+int _myenv(info_t *information)
+{
+	print_list_structure(information->env);
+	return (0);
+}
+
+/**
+ * _getenv - gets the value of an environment variable
+ * @info: Structure containing potential arguments. Used to maintain
+ * @name: env var name
+ *
+ * Return: the value
+ */
+char *_getenv(info_t *information, const char *name)
+{
+	list_t *node = information->env;
+	char *c;
+
+	while (node)
+	{
+		c = starts_with(node->structure, name);
+		if (c && *c)
+			return (c);
+		node = node->next;
+	}
+	return (NULL);
+}
+
+/**
+ * _mysetenv - Initialize a new environment variable / modify an existing one
+ * @info: Structure containing potential arguments. Used to maintain
+ *        constant function prototype.
+ *  Return: Always 0
+ */
+int _mysetenv(info_t *information)
+{
+	if (information->argc != 3)
+	{
+		_eputs("Incorrect number of arguments\n");
+		return (1);
+	}
+	if (_setenv(information, information->argv[1], information->argv[2]))
+		return (0);
+	return (1);
+}
+
+/**
+ * _my_unset_env - Remove an environment variable
+ * @info: Structure containing potential arguments. Used to maintain
+ *        constant function prototype.
+ *  Return: Always 0
+ */
+int _myunsetenv(info_t *information)
+{
+	int i;
+
+	if (information->argc == 1)
+	{
+		_eputs("Too Few Arguments.\n");
+		return (1);
+	}
+	for (i = 1; i <= information->argc; i++)
+		_unsetenv(information, information->argv[i]);
+
+	return (0);
+}
+
+/**
+ * populate_env_list - populates env linked list
+ * @info: Structure containing potential arguments. Used to maintain
+ *          constant function prototype.
+ * Return: Always 0
+ */
+int populate_env_list(info_t *information)
+{
+	list_t *node = NULL;
+	size_t i;
+
+	for (i = 0; environ[i]; i++)
+		add_node_end(&node, environ[i], 0);
+	information->env = node;
+	return (0);
+}
